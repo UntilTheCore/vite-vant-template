@@ -16,8 +16,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="home flex justify-center items-center h-screen">
-    <div class="home-wrap flex flex-col justify-center items-center">
+  <div class="home">
+    <div class="home-wrap">
       <div class="mb-4 text-6">store: {{ counterStore.counter }}</div>
       <van-button
         type="primary"

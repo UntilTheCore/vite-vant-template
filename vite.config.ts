@@ -6,6 +6,8 @@ import AutoImport from "unplugin-auto-import/vite";
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
 import UnoCSS from "unocss/vite";
 import { VantResolver } from "@vant/auto-import-resolver";
+import autoprefixer from "autoprefixer";
+import viewport from "postcss-mobile-forever";
 
 const htmlPlugin = (appName: string) => {
   return {
@@ -21,7 +23,7 @@ const htmlPlugin = (appName: string) => {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const appName = env.VITE_APP_NAME ? env.VITE_APP_NAME : "大屏";
+  const appName = env.VITE_APP_NAME ? env.VITE_APP_NAME : "";
   return {
     base: "./",
     plugins: [
@@ -64,16 +66,15 @@ export default defineConfig(({ mode }) => {
         return env.NODE_ENV === "production" ? ["console", "debugger"] : [];
       })()
     },
-    // According to the need to open proxy
-    // server: {
-    //   proxy: {
-    //     '/api': {
-    //       target: 'http://172.xx.xxx.xx/xxxxxxx/api',
-    //       changeOrigin: true,
-    //       rewrite: (path) => path.replace(/^\/api/, '')
-    //     }
-    //   }
-    // },
+    server: {
+      proxy: {
+        "/api": {
+          target: "http://172.xx.xxx.xx/xxxxxxx/api",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, "")
+        }
+      }
+    },
     resolve: {
       alias: [
         {
@@ -86,9 +87,21 @@ export default defineConfig(({ mode }) => {
       "process.env": process.env
     },
     css: {
-      preprocessorOptions: {
-        scss: {
-        }
+      postcss: {
+        plugins: [
+          autoprefixer(),
+          // https://github.com/wswmsword/postcss-mobile-forever
+          viewport({
+            appSelector: "#app",
+            viewportWidth: 375,
+            maxDisplayWidth: 600,
+            rootContainingBlockSelectorList: [
+              "van-tabbar",
+              "van-popup"
+            ],
+            border: true
+          })
+        ]
       }
     }
   };
